@@ -43,4 +43,4 @@ if ingredients_list:
   #new sectin to display to display smoothiefruit nutrition information
 import requests
 smoothiefroot_response=requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
-st.text(smoothiefroot_response)
+st.text(smoothiefroot_response.json())
