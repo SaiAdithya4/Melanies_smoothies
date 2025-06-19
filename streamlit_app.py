@@ -1,40 +1,35 @@
-# ✅ Do NOT import get_active_session
 import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 
-# ✅ Get Snowflake credentials from Streamlit Cloud Secrets
+# ✅ Step 1: Load Snowflake credentials from Streamlit Cloud Secrets
 sf_config = st.secrets["connection"]["snowflake"]
 
-# ✅ Create Snowpark session manually
+# ✅ Step 2: Create manual Snowpark session
 session = Session.builder.configs(sf_config).create()
 
-# 🧃 UI
+# ✅ Step 3: Build the Streamlit UI
 st.title("Customize Your SMOOTHIE 🥤")
 st.write("Choose the fruits you want in your custom SMOOTHIE.")
 
-# 👤 Name input
+# Name input
 name_on_order = st.text_input("Name on SMOOTHIE")
 st.write("The name on SMOOTHIE will be:", name_on_order)
 
-# 🍓 Load fruit list from Snowflake table
+# ✅ Step 4: Get fruit list from Snowflake
 fruit_df = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"))
 fruit_list = [row["FRUIT_NAME"] for row in fruit_df.collect()]
 
-# 🍍 Ingredient selection
-ingredients_list = st.multiselect(
-    "Choose up to 5 ingredients:",
-    fruit_list,
-    max_selections=5
-)
+# Multiselect box
+ingredients_list = st.multiselect("Choose up to 5 ingredients:", fruit_list, max_selections=5)
 
-# ✅ Submit button
+# ✅ Step 5: Submit Order to Snowflake
 if ingredients_list:
     ingredients_string = ' '.join(ingredients_list)
-    st.write("Ingredients:", ingredients_string)
+    st.write("Selected ingredients:", ingredients_string)
 
     insert_stmt = f"""
-        INSERT INTO smoothies.public.orders(ingredients, name_on_order)
+        INSERT INTO smoothies.public.orders (ingredients, name_on_order)
         VALUES ('{ingredients_string}', '{name_on_order}')
     """
 
